@@ -14,30 +14,26 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-import argparse
-import sys
 
-from . import smartmerge, load_plugins
+import importlib
+import unittest
 
-parser = argparse.ArgumentParser()
 
-parser.add_argument('--git', action='store_true')
-parser.add_argument('base', type=str)
-parser.add_argument('this', type=str)
-parser.add_argument('other', type=str)
-parser.add_argument('conflictlen', nargs='?', type=int)
+from .. import iter_plugins
 
-args = parser.parse_args()
 
-load_plugins()
+def test_suite():
+    names = [
+        ]
+    module_names = [__name__ + '.test_' + name for name in names]
+    loader = unittest.TestLoader()
+    suite = unittest.TestSuite()
 
-with open(args.this, 'rt') as f:
-    this = f.readlines()
-with open(args.base, 'rt') as f:
-    base = f.readlines()
-with open(args.other, 'rt') as f:
-    other = f.readlines()
-
-merged_lines = smartmerge(base, this, other)
-
-sys.stdout.writelines(merged_lines)
+    for plugin_name in iter_plugins():
+        m = importlib.import_module(
+            'smartmerge.plugins.' + plugin_name + '.tests')
+        load_tests = getattr(m, 'load_tests')
+        suite = unittest.TestSuite()
+        load_tests(loader, suite, None)
+    suite.addTests(loader.loadTestsFromNames(module_names))
+    return suite

@@ -11,7 +11,8 @@ setup(name="smartmerge",
       license="GNU GPLv2 or later",
       url="https://www.breezy-vcs.org/",
       packages=['smartmerge'],
-      test_suite='smartmerge.test_merge3',
+      test_suite='smartmerge.tests.test_suite',
+      install_requires=['merge3'],
       classifiers=[
           'Development Status :: 4 - Beta',
           'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',  # noqa

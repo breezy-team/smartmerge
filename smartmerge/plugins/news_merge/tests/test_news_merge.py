@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Breezy Developers
+# Copyright (C) 2010 by Canonical Ltd
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,30 +14,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-import argparse
-import sys
+# FIXME: This is totally incomplete but I'm only the patch pilot :-)
+# -- vila 100120
+# Note that the single test from this file is now in
+# test_merge.TestConfigurableFileMerger -- rbc 20100129.
 
-from . import smartmerge, load_plugins
-
-parser = argparse.ArgumentParser()
-
-parser.add_argument('--git', action='store_true')
-parser.add_argument('base', type=str)
-parser.add_argument('this', type=str)
-parser.add_argument('other', type=str)
-parser.add_argument('conflictlen', nargs='?', type=int)
-
-args = parser.parse_args()
-
-load_plugins()
-
-with open(args.this, 'rt') as f:
-    this = f.readlines()
-with open(args.base, 'rt') as f:
-    base = f.readlines()
-with open(args.other, 'rt') as f:
-    other = f.readlines()
-
-merged_lines = smartmerge(base, this, other)
-
-sys.stdout.writelines(merged_lines)
+from breezy import (
+    option,
+    tests,
+    )
+from breezy.merge import Merger
+from breezy.plugins import news_merge
