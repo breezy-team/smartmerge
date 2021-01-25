@@ -1,0 +1,24 @@
+Custom merging:
+* .po files
+* NEWS files
+* ChangeLog
+* https://pypi.org/project/xmldiff/
+* python with libCST
+* Clang
+* CSV
+ + https://github.com/tabbyrobin/csvdove
+ + https://github.com/defcube/csvmerge
+
+Preprocessing
+* gzip
+* Diffoscope
+
+Normalize
+* clang-format
+* Black
+* go-format
+
+Regenerate from source
+* configure.ac / configure.in => configure
+* Makefile.am => Makefile
+* Makefile.in => Makefile
