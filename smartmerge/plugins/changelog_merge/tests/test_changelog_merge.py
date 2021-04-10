@@ -31,7 +31,7 @@ sample_base_entries = [
 sample_this_entries = [
     b'This entry T1',
     b'This entry T2',
-    #'Base entry B1 updated',
+    # 'Base entry B1 updated',
     b'Base entry B1',
     b'Base entry B2',
     b'Base entry B3',
@@ -39,7 +39,7 @@ sample_this_entries = [
 
 sample_other_entries = [
     b'Other entry O1',
-    #'Base entry B1',
+    # 'Base entry B1',
     b'Base entry B1',
     b'Base entry B2 updated',
     b'Base entry B3',
@@ -55,14 +55,14 @@ sample2_base_entries = [
 sample2_this_entries = [
     b'This entry T1',
     b'This entry T2',
-    #'Base entry B1 updated',
+    # 'Base entry B1 updated',
     b'Base entry B1',
     b'Base entry B2',
     ]
 
 sample2_other_entries = [
     b'Other entry O1',
-    #'Base entry B1',
+    # 'Base entry B1',
     b'Base entry B1 edit',  # > 80% similar according to difflib
     b'Base entry B2',
     ]
@@ -125,9 +125,8 @@ class TestMergeCoreLogic(tests.TestCase):
         the new entry and the edited entry are adjacent.
         """
         def guess_edits(new, deleted):
-            #import pdb; pdb.set_trace()
-            return changelog_merge.default_guess_edits(new, deleted,
-                                                       entry_as_str=lambda x: x)
+            return changelog_merge.default_guess_edits(
+                new, deleted, entry_as_str=lambda x: x)
         result_entries = changelog_merge.merge_entries(
             sample2_base_entries, sample2_this_entries, sample2_other_entries,
             guess_edits=guess_edits)

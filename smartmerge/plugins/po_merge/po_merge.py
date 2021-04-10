@@ -106,9 +106,8 @@ class PoMerger(merge.PerFileMerger):
         # Do we have the corresponding .pot file
         for path, file_class, kind, entry in self.merger.this_tree.list_files(
                 from_dir=po_dir, recursive=False):
-            pot_name, pot_file_id = path, entry
-            if fnmatch.fnmatch(pot_name, self.pot_glob):
-                relpath = osutils.pathjoin(po_dir, pot_name)
+            if fnmatch.fnmatch(path, self.pot_glob):
+                relpath = osutils.pathjoin(po_dir, path)
                 self.pot_file_abspath = self.merger.this_tree.abspath(relpath)
                 # FIXME: I can't find an easy way to know if the .pot file has
                 # conflicts *during* the merge itself. So either the actual

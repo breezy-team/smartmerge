@@ -15,12 +15,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-import os
-
 from breezy import (
     merge,
     osutils,
-    tests,
     )
 from breezy.tests import (
     features,
@@ -115,10 +112,11 @@ def make_adduser_branch(test, relpath):
                                         _Adduser['other_po'])),
                             ], revision_id=b'other')
     # The 'this' branch
-    builder.build_snapshot([b'base'],
-                           [('modify', ('po/adduser.pot', _Adduser['this_pot'])),
-                            ('modify', ('po/fr.po', _Adduser['this_po'])),
-                            ], revision_id=b'this')
+    builder.build_snapshot(
+        [b'base'],
+        [('modify', ('po/adduser.pot', _Adduser['this_pot'])),
+         ('modify', ('po/fr.po', _Adduser['this_po']))],
+        revision_id=b'this')
     # builder.get_branch() tip is now 'this'
     builder.finish_series()
     return builder

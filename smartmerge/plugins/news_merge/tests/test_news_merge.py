@@ -18,10 +18,3 @@
 # -- vila 100120
 # Note that the single test from this file is now in
 # test_merge.TestConfigurableFileMerger -- rbc 20100129.
-
-from breezy import (
-    option,
-    tests,
-    )
-from breezy.merge import Merger
-from breezy.plugins import news_merge
