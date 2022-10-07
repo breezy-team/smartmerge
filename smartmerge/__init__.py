@@ -24,6 +24,10 @@ Register a function that can do a three-way merge for a specific file
 
 """
 
+
+__version__ = (0, 0, 1)
+
+
 import importlib
 import os
 
