@@ -18,11 +18,11 @@
 from breezy import (
     merge,
     osutils,
-    )
+)
 from breezy.tests import (
     features,
     script,
-    )
+)
 
 from breezy.plugins import po_merge
 

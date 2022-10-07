@@ -18,7 +18,7 @@
 def load_tests(loader, basic_tests, pattern):
     testmod_names = [
         'test_changelog_merge',
-        ]
+    ]
     basic_tests.addTest(loader.loadTestsFromNames(
-        ["%s.%s" % (__name__, tmn) for tmn in testmod_names]))
+        [f"{__name__}.{tmn}" for tmn in testmod_names]))
     return basic_tests

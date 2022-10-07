@@ -90,13 +90,12 @@ class PerFileMerger(AbstractPerFileMerger):
     def merge_contents(self, params):
         """Merge the contents of a single file."""
         # Check whether this custom merge logic should be used.
-        if (
-            # OTHER is a straight winner, rely on default merge.
-            params.winner == 'other' or
-            # THIS and OTHER aren't both files.
-            not params.is_file_merge() or
-            # The filename doesn't match
-                not self.file_matches(params)):
+        if (    # OTHER is a straight winner, rely on default merge.
+                params.winner == 'other'
+                # THIS and OTHER aren't both files.
+                or not params.is_file_merge()
+                # The filename doesn't match
+                or not self.file_matches(params)):
             return 'not_applicable', None
         return self.merge_matching(params)
 

@@ -24,7 +24,7 @@ from .. import iter_plugins
 
 def test_suite():
     names = [
-        ]
+    ]
     module_names = [__name__ + '.test_' + name for name in names]
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
