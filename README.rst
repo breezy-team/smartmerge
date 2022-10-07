@@ -10,7 +10,7 @@ Usage in Git
 ~~~~~~~~~~~~
 
 To define smartmerge as a custom merge driver inside of git, add the following
-to your ~/.gitconfig::
+to your ~/.gitconfig or /etc/gitconfig::
 
     [merge "smartmerge"]
       name = smartmerge
