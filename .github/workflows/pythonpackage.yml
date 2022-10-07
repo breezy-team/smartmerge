@@ -31,6 +31,6 @@ jobs:
           python -m flake8
       - name: Test suite run
         run: |
-          python setup.py test
+          python -m unittest smartmerge.tests.test_suite
         env:
           PYTHONHASHSEED: random
