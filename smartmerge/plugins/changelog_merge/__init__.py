@@ -71,7 +71,7 @@ install_custom_merger(changelog_merge_hook, 'GNU ChangeLog file merge')
 def load_tests(loader, basic_tests, pattern):
     testmod_names = [
         'tests',
-        ]
+    ]
     basic_tests.addTest(loader.loadTestsFromModuleNames(
-        ["%s.%s" % (__name__, tmn) for tmn in testmod_names]))
+        [f"{__name__}.{tmn}" for tmn in testmod_names]))
     return basic_tests

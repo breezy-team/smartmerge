@@ -19,7 +19,7 @@
 from ... import (
     config,
     merge,
-    )
+)
 
 
 import fnmatch
@@ -30,7 +30,7 @@ from breezy import (
     cmdline,
     osutils,
     trace,
-    )
+)
 
 
 command_option = config.Option(

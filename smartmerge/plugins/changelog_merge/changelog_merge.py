@@ -22,7 +22,7 @@ from ... import (
     debug,
     merge,
     osutils,
-    )
+)
 from ...merge3 import Merge3
 from ...trace import mutter
 

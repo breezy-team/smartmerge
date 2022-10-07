@@ -17,7 +17,7 @@
 from breezy import (
     merge,
     tests,
-    )
+)
 from breezy.tests import test_merge_core
 from breezy.plugins.changelog_merge import changelog_merge
 
@@ -26,7 +26,7 @@ sample_base_entries = [
     b'Base entry B1',
     b'Base entry B2',
     b'Base entry B3',
-    ]
+]
 
 sample_this_entries = [
     b'This entry T1',
@@ -35,7 +35,7 @@ sample_this_entries = [
     b'Base entry B1',
     b'Base entry B2',
     b'Base entry B3',
-    ]
+]
 
 sample_other_entries = [
     b'Other entry O1',
@@ -43,14 +43,14 @@ sample_other_entries = [
     b'Base entry B1',
     b'Base entry B2 updated',
     b'Base entry B3',
-    ]
+]
 
 
 sample2_base_entries = [
     b'Base entry B1',
     b'Base entry B2',
     b'Base entry B3',
-    ]
+]
 
 sample2_this_entries = [
     b'This entry T1',
@@ -58,14 +58,14 @@ sample2_this_entries = [
     # 'Base entry B1 updated',
     b'Base entry B1',
     b'Base entry B2',
-    ]
+]
 
 sample2_other_entries = [
     b'Other entry O1',
     # 'Base entry B1',
     b'Base entry B1 edit',  # > 80% similar according to difflib
     b'Base entry B2',
-    ]
+]
 
 
 class TestMergeCoreLogic(tests.TestCase):
@@ -117,8 +117,7 @@ class TestMergeCoreLogic(tests.TestCase):
             b'Base entry B1',
             b'Base entry B2 updated',
             b'Base entry B3',
-            ],
-            list(result_entries))
+        ], list(result_entries))
 
     def test_more_complex_conflict(self):
         """Like test_acceptance_bug_723968, but with a more difficult conflict:
@@ -136,8 +135,7 @@ class TestMergeCoreLogic(tests.TestCase):
             b'This entry T2',
             b'Base entry B1 edit',
             b'Base entry B2',
-            ],
-            list(result_entries))
+        ], list(result_entries))
 
     def test_too_hard(self):
         """A conflict this plugin cannot resolve raises EntryConflict.
