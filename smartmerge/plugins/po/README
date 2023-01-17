@@ -1,0 +1,4 @@
+A plugin for merging .po files.
+
+This hook can avoid conflicts in ``.po` files by invoking msgmerge with the
+appropriate options.

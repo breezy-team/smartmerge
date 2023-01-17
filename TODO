@@ -1,13 +1,20 @@
+smartmerge --git --install
+
+* Have some way in Git to indicate not_applicable
+
 Custom merging:
-* .po files
-* NEWS files
-* ChangeLog
-* https://pypi.org/project/xmldiff/
-* python with libCST
-* Clang
+* .po files (implemented); should just use git-po-merge instead?
+* NEWS files (implemented)
+* GNU ChangeLog (implemented); should just use git-merge-changelog instead
+* debian changelog (implemented)
 * CSV
  + https://github.com/tabbyrobin/csvdove
  + https://github.com/defcube/csvmerge
+* https://github.com/balbuf/composer-git-merge-driver
+
+* python with libCST
+* Clang
+* https://pypi.org/project/xmldiff/
 
 Preprocessing
 * gzip

@@ -14,17 +14,55 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-"""Merge logic for changelog_merge plugin."""
+__doc__ = """Merge hook for GNU-format ChangeLog files
+
+To enable this plugin, add a section to your locations.conf
+like::
+
+    [/home/user/proj]
+    changelog_merge_files = ChangeLog
+
+Or add an entry to your branch.conf like::
+
+    changelog_merge_files = ChangeLog
+
+The changelog_merge_files config option takes a list of file names (not paths),
+separated by commas.  (This is unlike the news_merge plugin, which matches
+paths.)  e.g. the above config examples would match both
+``src/foolib/ChangeLog`` and ``docs/ChangeLog``.
+
+The algorithm used to merge the changes can be summarised as:
+
+ * new entries added to the top of OTHER are emitted first
+ * all other additions, deletions and edits from THIS and OTHER are preserved
+ * edits (e.g. to fix typos) at the top of OTHER are hard to distinguish from
+   adding and deleting independent entries; the algorithm tries to guess which
+   based on how similar the old and new entries are.
+
+Caveats
+-------
+
+Most changes can be merged, but conflicts are possible if the plugin finds
+edits at the top of OTHER to entries that have been deleted (or also edited) by
+THIS.  In that case the plugin gives up and bzr's default merge logic will be
+used.
+
+No effort is made to deduplicate entries added by both sides.
+
+The results depend on the choice of the 'base' version, so it might give
+strange results if there is a criss-cross merge.
+"""
 
 import difflib
+import logging
+import posixpath
 
-from ... import (
-    debug,
-    merge,
-    osutils,
-)
-from ...merge3 import Merge3
-from ...trace import mutter
+from smartmerge import install_custom_file_merger, PerLineFileMerger, run_per_file_merger
+
+from merge3 import Merge3
+
+
+logger = logging.getLogger('smartmerge.changelog_merge')
 
 
 def changelog_entries(lines):
@@ -56,30 +94,20 @@ def entries_to_lines(entries):
             yield line
 
 
-class ChangeLogMerger(merge.ConfigurableFileMerger):
+class GnuChangeLogMerger(PerLineFileMerger):
     """Merge GNU-format ChangeLog files."""
 
-    name_prefix = "changelog"
+    summary = 'GNU ChangeLog file merge'
 
-    def file_matches(self, params):
-        affected_files = self.affected_files
-        if affected_files is None:
-            config = self.merger.this_branch.get_config()
-            # Until bzr provides a better policy for caching the config, we
-            # just add the part we're interested in to the params to avoid
-            # reading the config files repeatedly (breezy.conf, location.conf,
-            # branch.conf).
-            config_key = self.name_prefix + '_merge_files'
-            affected_files = config.get_user_option_as_list(config_key)
-            if affected_files is None:
-                # If nothing was specified in the config, use the default.
-                affected_files = self.default_files
-            self.affected_files = affected_files
-        if affected_files:
-            filepath = osutils.basename(params.this_path)
-            if filepath in affected_files:
-                return True
-        return False
+    config_key = "gnu_changelog"
+
+    @classmethod
+    def git_patterns(cls):
+        return ['ChangeLog']
+
+    @classmethod
+    def can_handle(self, path):
+        return path == 'ChangeLog'
 
     def merge_text(self, params):
         """Merge changelog changes.
@@ -154,8 +182,7 @@ def merge_entries(base_entries, this_entries, other_entries,
     result_entries = []
     at_top = True
     for group in m3.merge_groups():
-        if 'changelog_merge' in debug.debug_flags:
-            mutter('merge group:\n%r', group)
+        logger.debug('merge group:\n%r', group)
         group_kind = group[0]
         if group_kind == 'conflict':
             _, base, this, other = group
@@ -173,11 +200,10 @@ def merge_entries(base_entries, this_entries, other_entries,
                 # Changes not made at the top are always preserved as is, no
                 # need to try distinguish edits from adds and deletes.
                 edits_in_other = []
-            if 'changelog_merge' in debug.debug_flags:
-                mutter('at_top: %r', at_top)
-                mutter('new_in_other: %r', new_in_other)
-                mutter('deleted_in_other: %r', deleted_in_other)
-                mutter('edits_in_other: %r', edits_in_other)
+            logger.debug('at_top: %r', at_top)
+            logger.debug('new_in_other: %r', new_in_other)
+            logger.debug('deleted_in_other: %r', deleted_in_other)
+            logger.debug('edits_in_other: %r', edits_in_other)
             # Apply deletes and edits
             updated_this = [
                 entry for entry in this if entry not in deleted_in_other]
@@ -189,8 +215,7 @@ def merge_entries(base_entries, this_entries, other_entries,
                     # declare a conflict.
                     raise EntryConflict()
                 updated_this[index] = new_entry
-            if 'changelog_merge' in debug.debug_flags:
-                mutter('updated_this: %r', updated_this)
+            logger.debug('updated_this: %r', updated_this)
             if at_top:
                 # Float new entries from other to the top
                 result_entries = new_in_other + result_entries
@@ -202,3 +227,23 @@ def merge_entries(base_entries, this_entries, other_entries,
             result_entries.extend(lines)
         at_top = False
     return result_entries
+
+# Put most of the code in a separate module that we lazy-import to keep the
+# overhead of this plugin as minimal as possible.
+
+
+install_custom_file_merger(GnuChangeLogMerger)
+
+
+def load_tests(loader, basic_tests, pattern):
+    testmod_names = [
+        'tests',
+        ]
+    basic_tests.addTest(loader.loadTestsFromModuleNames(
+        ["%s.%s" % (__name__, tmn) for tmn in testmod_names]))
+    return basic_tests
+
+
+if __name__ == '__main__':
+    import sys
+    sys.exit(run_per_file_merger(GnuChangeLogMerger))

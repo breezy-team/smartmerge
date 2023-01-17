@@ -14,21 +14,83 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-"""Merge logic for news_merge plugin."""
+__doc__ = """Merge hook for bzr's NEWS file.
+
+To enable this plugin, add a section to your branch.conf or location.conf
+like::
+
+    [/home/user/code/bzr]
+    news_merge_files = NEWS
+
+The news_merge_files config option takes a list of file paths, separated by
+commas.
+
+Limitations:
+
+* if there's a conflict in more than just bullet points, this doesn't yet know
+  how to resolve that, so bzr will fallback to the default line-based merge.
+"""
+
+from smartmerge import PerLineFileMerger, install_custom_file_merger
 
 import merge3
 
 
-from .parser import simple_parse_lines
-from ... import merge
+def simple_parse_lines(lines):
+    """Same as simple_parse, but takes an iterable of strs rather than a single
+    str.
+    """
+    return simple_parse(''.join(lines))
 
 
-class NewsMerger(merge.ConfigurableFileMerger):
+def simple_parse(content):
+    """Returns blocks, where each block is a 2-tuple (kind, text).
+
+    :kind: one of 'heading', 'release', 'section', 'empty' or 'text'.
+    :text: a str, including newlines.
+    """
+    blocks = content.split('\n\n')
+    for block in blocks:
+        if block.startswith('###'):
+            # First line is ###...: Top heading
+            yield 'heading', block
+            continue
+        last_line = block.rsplit('\n', 1)[-1]
+        if last_line.startswith('###'):
+            # last line is ###...: 2nd-level heading
+            yield 'release', block
+        elif last_line.startswith('***'):
+            # last line is ***...: 3rd-level heading
+            yield 'section', block
+        elif block.startswith('* '):
+            # bullet
+            yield 'bullet', block
+        elif block.strip() == '':
+            # empty
+            yield 'empty', block
+        else:
+            # plain text
+            yield 'text', block
+
+
+class NewsMerger(PerLineFileMerger):
     """Merge bzr NEWS files."""
 
-    name_prefix = "news"
+    summary = "NEWS file merge"
 
-    def merge_text(self, params):
+    config_key = "news"
+
+    @classmethod
+    def can_handle(cls, path):
+        # TODO(jelmer)
+        return False
+
+    @classmethod
+    def git_patterns(cls):
+        # TODO(jelmer)
+        return []
+
+    def merge_text(self, this_lines, other_lines, base_lines):
         """Perform a simple 3-way merge of a bzr NEWS file.
 
         Each section of a bzr NEWS file is essentially an ordered set of bullet
@@ -76,3 +138,11 @@ class NewsMerger(merge.ConfigurableFileMerger):
 
 def sort_key(chunk):
     return chunk[1].replace('`', '').lower()
+
+
+install_custom_file_merger(NewsMerger)
+
+
+def test_suite():
+    from . import tests
+    return tests.test_suite()
